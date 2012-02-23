@@ -1,5 +1,4 @@
-﻿#DBSzachy.py
-import sqlite3
+﻿import sqlite3
 def rwiezy(odjem,pole,npole,c,zkolor,k,l):
     if int(odjem)/8 in k:
         print("prosto")
@@ -13,7 +12,6 @@ def rwiezy(odjem,pole,npole,c,zkolor,k,l):
             print(g)
             if g==None:
                 p=1
-                continue
             elif g!=None:
                 if i*8==odjem and g[0]==zkolor:
                     return 2
@@ -33,7 +31,6 @@ def rwiezy(odjem,pole,npole,c,zkolor,k,l):
             if g==None:
                 p=1
                 i+=1
-                continue
             elif g!=None:
                 if i*8==-odjem and g[0]==zkolor:
                     return 2
@@ -223,7 +220,6 @@ while True:
     else:
         npionka=pion
     npole=input("Wybierz pole na które chcesz go przemieścić: ")
-    #print(pole,npole,npionka,"biały",c)
     out=sprawdzpole(pole,npole,npionka,kgr,c)
     if out==1:
         print("Ruch wykonany!")
