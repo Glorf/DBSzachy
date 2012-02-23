@@ -1,0 +1,8 @@
+DBSzachy jest projektem mającym na celu stworzenie programu szachowego całkowicie w Pythonie
+Fazy projektu:
+a) budowa jądra (obecnie) [0.1]
+b) optymalizacja [0.2]
+c) przygotowanie AI [0.3]
+d) optymalizacja [0.4]
+e) przystosowanie do Gtk przez pygobject-introspection [0.5]
+f) ostateczne poprawki [1.0]
