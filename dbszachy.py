@@ -104,6 +104,44 @@ def rwiezy(odjem,pole,npole,c,zkolor,k,l):
                         return 0
                 if p==1:
                     return 1
+def rgonca(odjem,pole,npole,c,zkolor,k,l,z,kol):
+    for x in z:
+        if odjem/x in k:
+            ln=odjem/x
+            p=0
+            i=0
+            while ln>i:
+                i+=1
+                pl=pole+i*x
+                c.execute('''select kolor from pionki where pole={0}'''.format(pl))
+                o=c.fetchone()
+                if o!=None:
+                    if o[0]==zkolor and pl==int(npole):
+                        return 2
+                    else:
+                        return 0
+                else:
+                    p=1
+            if kol==None and p==1:
+                return 1
+        elif odjem/x in l:
+            ln=odjem/x
+            p=0
+            i=0
+            while ln<i:
+                i-=1
+                pl=pole+i*x
+                c.execute('''select kolor from pionki where pole={0}'''.format(pl))
+                o=c.fetchone()
+                if o!=None:
+                    if o[0]==zkolor and int(npole)==pl:
+                        return 2
+                    else:
+                        return 0
+                else:
+                    p=1
+            if kol==None and p==1:
+                return 1
 def lista(c,wartosc):
     c=con.cursor()
     i=0
@@ -137,7 +175,6 @@ def sprawdzpole(pole,npole,pion,kolor,c):
     k=[1,2,3,4,5,6,7,8]
     l=[-1,-2,-3,-4,-5,-6,-7,-8]
     z=[7,9]
-    y=[-7,-9]
     if kolor=="bialy":
         zkolor="czarny"
     if kolor=="czarny":
@@ -164,7 +201,7 @@ def sprawdzpole(pole,npole,pion,kolor,c):
             return 0
     elif pion=="wieza":
         print("wieza")
-        w=rwiezy(odjem,pole,npole,c,zkolor)
+        w=rwiezy(odjem,pole,npole,c,zkolor,k,l)
         if w==1:
             return 1
         elif w==2:
@@ -182,43 +219,23 @@ def sprawdzpole(pole,npole,pion,kolor,c):
         else:
             return 0
     elif pion=="goniec":
-        for x in z:
-            if odjem/x in k:
-                ln=odjem/x
-                p=0
-                i=0
-                while ln>i:
-                    i+=1
-                    pl=pole+i*x
-                    c.execute('''select kolor from pionki where pole={0}'''.format(pl))
-                    o=c.fetchone()
-                    if o!=None:
-                        if o[0]==zkolor and npole==pl:
-                            return 2
-                        else:
-                            return 0
-                    else:
-                        p=1
-                if kol==None and p==1:
-                    return 1
-            elif odjem/x in l:
-                ln=odjem/x
-                p=0
-                i=0
-                while ln<i:
-                    i-=1
-                    pl=pole+i*x
-                    c.execute('''select kolor from pionki where pole={0}'''.format(pl))
-                    o=c.fetchone()
-                    if o!=None:
-                        if o[0]==zkolor and npole==pl:
-                            return 2
-                        else:
-                            return 0
-                    else:
-                        p=1
-                if kol==None and p==1:
-                    return 1
+        g=rgonca(odjem,pole,npole,c,zkolor,k,l,z,kol)
+        if g==1:
+            return 1
+        elif g==2:
+            return 2
+        elif g==0:
+            return 0
+    elif pion=="dama":
+        w=rwiezy(odjem,pole,npole,c,zkolor,k,l)
+        g=rgonca(odjem,pole,npole,c,zkolor,k,l,z,kol)
+        for x in [w,g]:
+            if x==0:
+                return 0
+            elif x==1:
+                return 1
+            elif x==2:
+                return 2
     else:
         print("Kild")
         return 0
