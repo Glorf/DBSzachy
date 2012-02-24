@@ -1,4 +1,36 @@
-﻿import sqlite3
+﻿#Copyright: Michał Bień 2012
+    #This program is free software; you can redistribute it and/or modify
+    #it under the terms of the GNU General Public License as published by
+    #the Free Software Foundation; either version 2 of the License, or
+    #(at your option) any later version.
+
+    #This program is distributed in the hope that it will be useful,
+    #but WITHOUT ANY WARRANTY; without even the implied warranty of
+    #MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    #GNU General Public License for more details.
+
+    #You should have received a copy of the GNU General Public License
+    #along with this program; if not, write to the Free Software
+    #Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+    #Niniejszy program jest wolnym oprogramowaniem; możesz go
+    #rozprowadzać dalej i/lub modyfikować na warunkach Powszechnej
+    #Licencji Publicznej GNU, wydanej przez Fundację Wolnego
+    #Oprogramowania - według wersji 2 tej Licencji lub (według twojego
+    #wyboru) którejś z późniejszych wersji.
+
+    #Niniejszy program rozpowszechniany jest z nadzieją, iż będzie on
+    #użyteczny - jednak BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyślnej
+    #gwarancji PRZYDATNOŚCI HANDLOWEJ albo PRZYDATNOŚCI DO OKREŚLONYCH
+    #ZASTOSOWAŃ. W celu uzyskania bliższych informacji sięgnij do
+    #Powszechnej Licencji Publicznej GNU.
+
+    #Z pewnością wraz z niniejszym programem otrzymałeś też egzemplarz
+    #Powszechnej Licencji Publicznej GNU (GNU General Public License);
+    #jeśli nie - napisz do Free Software Foundation, Inc., 59 Temple
+    #Place, Fifth Floor, Boston, MA  02110-1301  USA
+
+import sqlite3
 def rwiezy(odjem,pole,npole,c,zkolor,k,l):
     if int(odjem)/8 in k:
         print("prosto")
@@ -104,6 +136,8 @@ def szachowrysuj(c):
 def sprawdzpole(pole,npole,pion,kolor,c):
     k=[1,2,3,4,5,6,7,8]
     l=[-1,-2,-3,-4,-5,-6,-7,-8]
+    z=[7,9]
+    y=[-7,-9]
     if kolor=="bialy":
         zkolor="czarny"
     if kolor=="czarny":
@@ -148,24 +182,43 @@ def sprawdzpole(pole,npole,pion,kolor,c):
         else:
             return 0
     elif pion=="goniec":
-        if odjem/7 in k:
-            ln=odjem/7
-            p=0
-            i=0
-            while ln>i:
-                i+=1
-                pl=pole+i*7
-                c.execute('''select kolor from pionki where pole={0}'''.format(pl))
-                o=c.fetchone()
-                if o!=None:
-                    if o[0]==zkolor and pole==pl:
-                        return 2
+        for x in z:
+            if odjem/x in k:
+                ln=odjem/x
+                p=0
+                i=0
+                while ln>i:
+                    i+=1
+                    pl=pole+i*x
+                    c.execute('''select kolor from pionki where pole={0}'''.format(pl))
+                    o=c.fetchone()
+                    if o!=None:
+                        if o[0]==zkolor and npole==pl:
+                            return 2
+                        else:
+                            return 0
                     else:
-                        return 0
-                else:
-                    p=1
-            if kol==None and p==1:
-                return 1
+                        p=1
+                if kol==None and p==1:
+                    return 1
+            elif odjem/x in l:
+                ln=odjem/x
+                p=0
+                i=0
+                while ln<i:
+                    i-=1
+                    pl=pole+i*x
+                    c.execute('''select kolor from pionki where pole={0}'''.format(pl))
+                    o=c.fetchone()
+                    if o!=None:
+                        if o[0]==zkolor and npole==pl:
+                            return 2
+                        else:
+                            return 0
+                    else:
+                        p=1
+                if kol==None and p==1:
+                    return 1
     else:
         print("Kild")
         return 0
