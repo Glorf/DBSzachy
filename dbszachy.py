@@ -193,9 +193,9 @@ def sprawdzpole(pole,npole,pion,kolor,c):
         elif kolor=="bialy":
             dnpole=npole
             dpole=pole
-        if kol==None and int(dnpole)-8==dpole:
+        if kol==None and int(dnpole)-8==int(dpole):
             return 1
-        elif kol==zkolor and (int(dnpole-7)==dpole or int(dnpole-9)==dpole):
+        elif kol==zkolor and (int(dnpole)-7==int(dpole) or int(dnpole)-9==int(dpole)):
             return 2
         else:
             return 0
@@ -236,6 +236,16 @@ def sprawdzpole(pole,npole,pion,kolor,c):
                 return 1
             elif x==2:
                 return 2
+    elif pion=="krol":
+        if int(odjem) in [9,8,7,1,-9,-8,-7,-1]:
+            if kol==zkolor:
+                return 2
+            elif kol==None:
+                return 1
+            else:
+                return 0
+        else:
+            return 0
     else:
         print("Kild")
         return 0
