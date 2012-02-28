@@ -1,4 +1,5 @@
 ﻿#Copyright: Michał Bień 2012
+
     #This program is free software; you can redistribute it and/or modify
     #it under the terms of the GNU General Public License as published by
     #the Free Software Foundation; either version 2 of the License, or
@@ -12,23 +13,6 @@
     #You should have received a copy of the GNU General Public License
     #along with this program; if not, write to the Free Software
     #Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-    #Niniejszy program jest wolnym oprogramowaniem; możesz go
-    #rozprowadzać dalej i/lub modyfikować na warunkach Powszechnej
-    #Licencji Publicznej GNU, wydanej przez Fundację Wolnego
-    #Oprogramowania - według wersji 2 tej Licencji lub (według twojego
-    #wyboru) którejś z późniejszych wersji.
-
-    #Niniejszy program rozpowszechniany jest z nadzieją, iż będzie on
-    #użyteczny - jednak BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyślnej
-    #gwarancji PRZYDATNOŚCI HANDLOWEJ albo PRZYDATNOŚCI DO OKREŚLONYCH
-    #ZASTOSOWAŃ. W celu uzyskania bliższych informacji sięgnij do
-    #Powszechnej Licencji Publicznej GNU.
-
-    #Z pewnością wraz z niniejszym programem otrzymałeś też egzemplarz
-    #Powszechnej Licencji Publicznej GNU (GNU General Public License);
-    #jeśli nie - napisz do Free Software Foundation, Inc., 59 Temple
-    #Place, Fifth Floor, Boston, MA  02110-1301  USA
 
 import sqlite3
 def rwiezy(odjem,pole,npole,c,zkolor,k,l):
@@ -171,14 +155,10 @@ def szachowrysuj(c):
         print("|  "+str(j-7).ljust(2)+"   |  "+str(j-6).ljust(2)+"   |  "+str(j-5).ljust(2)+"   |  "+str(j-4).ljust(2)+"   |  "+str(j-3).ljust(2)+
               "   |  "+str(j-2).ljust(2)+"   |  "+str(j-1).ljust(2)+"   |  "+str(j).ljust(2)+"   |")
         j-=8
-def sprawdzpole(pole,npole,pion,kolor,c):
+def sprawdzpole(pole,npole,pion,kolor,c,zkolor):
     k=[1,2,3,4,5,6,7,8]
     l=[-1,-2,-3,-4,-5,-6,-7,-8]
     z=[7,9]
-    if kolor=="bialy":
-        zkolor="czarny"
-    if kolor=="czarny":
-        zkolor="bialy"
     c.execute('''select kolor from pionki where pole={0}'''.format(npole))
     kol=c.fetchone()
     print(pole,npole,pion,kolor)
@@ -249,6 +229,70 @@ def sprawdzpole(pole,npole,pion,kolor,c):
     else:
         print("Kild")
         return 0
+def sprawdzszach(kolor,c,zkolor):
+    k=[1,2,3,4,5,6,7,8]
+    pola=list()
+    i=0
+    while i<64:
+        i+=1
+        pola.append('x')
+    i=0
+    while i<=64:
+        i+=1
+        c.execute('''select pionek from pionki where pole={0}'''.format(i))
+        cpn=c.fetchone()
+        h=i-1
+        if cpn==None:
+            continue
+        elif cpn!=None:
+            pn=cpn[0]
+            c.execute('''select kolor from pionki where pole={0}'''.format(i))
+            ckr=c.fetchone()
+            kr=ckr[0]
+            if kr==zkolor:
+                #print(pn,kr)
+                if pn[:-1]=="pion":
+                    if kr=="bialy":
+                        if (i-1)/8 in k:
+                            s=[9]
+                        elif i/8 in k:
+                            s=[7]
+                        else:
+                            s=[7,9]
+                    if kr=="czarny":
+                        if (i-1)/8 in k:
+                            s=[-7]
+                        elif i/8 in k:
+                            s=[-9]
+                        else:
+                            s=[-7,-9]
+                    for l in s:
+                        try:
+                            pola[h+l]="v"
+                        except Exception:
+                            continue
+                if pn[:-1]=="wieza":
+                    f=int(h/8)
+                    mnp=7-f
+                    mnm=f
+                    if mnp>0:
+                        j=0
+                        while j<mnp:
+                            j+=1
+                            c.execute('''select pionek from pionki where pole={0}'''.format(i+j*8))
+                            if c.fetchone()==None:
+                                pola[h+j*8]="v"
+                    if mnm>0:
+                        j=0
+                        while j<mnm:
+                            j+=1
+                            c.execute('''select pionek from pionki where pole={0}'''.format(i-j*8))
+                            if c.fetchone()==None:
+                                pola[h-j*8]="v"
+    num=56
+    while num>=0:
+        print(pola[num]+pola[1+num]+pola[2+num]+pola[3+num]+pola[4+num]+pola[5+num]+pola[6+num]+pola[7+num])
+        num-=8
 con=sqlite3.connect(':memory:')
 c=con.cursor()
 c.execute('''create table pionki(pionek,kolor,pole,zywy)''')
@@ -290,6 +334,11 @@ while True:
     elif stat==2:
         kgr="czarny"
     szachowrysuj(c)
+    if kgr=="bialy":
+        zkolor="czarny"
+    if kgr=="czarny":
+        zkolor="bialy"
+    sprawdzszach(kgr,c,zkolor)
     print("Ruch",kgr[:-1]+"ego!")
     pion=input("Którego pionka chcesz przemiescic?: ")
     c.execute('''select pole from pionki where (pionek="{0}" and kolor="{1}")'''.format(pion,kgr))
@@ -300,7 +349,7 @@ while True:
     else:
         npionka=pion
     npole=input("Wybierz pole na które chcesz go przemieścić: ")
-    out=sprawdzpole(pole,npole,npionka,kgr,c)
+    out=sprawdzpole(pole,npole,npionka,kgr,c,zkolor)
     if out==1:
         print("Ruch wykonany!")
         c.execute('''insert into pionki values('{0}','{1}',{2},1)'''.format(pion,kgr,npole))
