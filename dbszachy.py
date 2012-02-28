@@ -58,6 +58,8 @@ def rwiezy(odjem,pole,npole,c,zkolor,k,l):
         if odjem<8 and odjem>0:
             j=0
             p=0
+            if int(pole)/8 in k:
+                    return 0
             while j<odjem:
                 j+=1
                 c.execute('''select kolor from pionki where pole={0}'''.format(int(pole)+j))
@@ -65,7 +67,6 @@ def rwiezy(odjem,pole,npole,c,zkolor,k,l):
                 if kl==None:
                     p=1
                 if kl!=None:
-                    print("kanienon")
                     if int(pole)+j==int(npole) and kl[0]==zkolor:
                         return 2
                     else:
@@ -75,6 +76,8 @@ def rwiezy(odjem,pole,npole,c,zkolor,k,l):
         elif odjem>-8 and odjem<0:
             j=0
             p=0
+            if (int(pole)-1)/8 in k:
+                return 0
             while j>odjem:
                 j-=1
                 c.execute('''select kolor from pionki where pole={0}'''.format(int(pole)+j))
@@ -271,7 +274,7 @@ def sprawdzszach(kolor,c,zkolor):
                             pola[h+l]="v"
                         except Exception:
                             continue
-                if pn[:-1]=="wieza":
+                elif pn[:-1]=="wieza":
                     f=int(h/8)
                     mnp=7-f
                     mnm=f
@@ -282,6 +285,8 @@ def sprawdzszach(kolor,c,zkolor):
                             c.execute('''select pionek from pionki where pole={0}'''.format(i+j*8))
                             if c.fetchone()==None:
                                 pola[h+j*8]="v"
+                            else:
+                                break
                     if mnm>0:
                         j=0
                         while j<mnm:
@@ -289,6 +294,33 @@ def sprawdzszach(kolor,c,zkolor):
                             c.execute('''select pionek from pionki where pole={0}'''.format(i-j*8))
                             if c.fetchone()==None:
                                 pola[h-j*8]="v"
+                            else:
+                                break
+                elif pn[:-1]=="goniec":
+                    f=int(h/8)
+                    mnp=7-f
+                    mnm=f
+                    s=[7,9]
+                    if mnp>0:
+                        j=0
+                        for l in s:
+                            while j<mnp:
+                                j+=1
+                                c.execute('''select pionek from pionki where pole={0}'''.format(i+j*l))
+                                if c.fetchone()==None:
+                                    pola[h+j*l]="v"
+                                else:
+                                    break
+                    if mnm>0:
+                        j=0
+                        for l in s:
+                            while j<mnm:
+                                j+=1
+                                c.execute('''select pionek from pionki where pole={0}'''.format(i-j*l))
+                                if c.fetchone()==None:
+                                    pola[h-j*l]="v"
+                                else:
+                                    break
     num=56
     while num>=0:
         print(pola[num]+pola[1+num]+pola[2+num]+pola[3+num]+pola[4+num]+pola[5+num]+pola[6+num]+pola[7+num])
@@ -338,7 +370,7 @@ while True:
         zkolor="czarny"
     if kgr=="czarny":
         zkolor="bialy"
-    sprawdzszach(kgr,c,zkolor)
+    #sprawdzszach(kgr,c,zkolor)
     print("Ruch",kgr[:-1]+"ego!")
     pion=input("Którego pionka chcesz przemiescic?: ")
     c.execute('''select pole from pionki where (pionek="{0}" and kolor="{1}")'''.format(pion,kgr))
