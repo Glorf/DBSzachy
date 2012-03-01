@@ -64,6 +64,8 @@ def rwiezy(odjem,pole,npole,c,zkolor,k,l):
                 j+=1
                 c.execute('''select kolor from pionki where pole={0}'''.format(int(pole)+j))
                 kl=c.fetchone()
+                if ((int(pole)+j)/8 in k) and int(pole)+j!=int(npole):
+                    return 0
                 if kl==None:
                     p=1
                 if kl!=None:
@@ -82,6 +84,8 @@ def rwiezy(odjem,pole,npole,c,zkolor,k,l):
                 j-=1
                 c.execute('''select kolor from pionki where pole={0}'''.format(int(pole)+j))
                 kl=c.fetchone()
+                if ((int(pole)+j-1)/8 in k) and int(pole)+j!=int(npole):
+                    return 0
                 if kl==None:
                     p=1
                 if kl!=None:
@@ -97,8 +101,12 @@ def rgonca(odjem,pole,npole,c,zkolor,k,l,z,kol):
             ln=odjem/x
             p=0
             i=0
+            if int(pole)/8 in k:
+                return 0
             while ln>i:
                 i+=1
+                if ((int(pole)+i)/8 in k) and int(pole)+i!=int(npole):
+                    return 0
                 pl=pole+i*x
                 c.execute('''select kolor from pionki where pole={0}'''.format(pl))
                 o=c.fetchone()
@@ -115,8 +123,12 @@ def rgonca(odjem,pole,npole,c,zkolor,k,l,z,kol):
             ln=odjem/x
             p=0
             i=0
+            if (int(pole)-1)/8 in k:
+                return 0
             while ln<i:
                 i-=1
+                if ((int(pole)+i-1)/8 in k) and int(pole)+i!=int(npole):
+                    return 0
                 pl=pole+i*x
                 c.execute('''select kolor from pionki where pole={0}'''.format(pl))
                 o=c.fetchone()
